@@ -1,0 +1,23 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: events-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bankpulse_domains?currentSchema=events}
+    username: ${SPRING_DATASOURCE_USERNAME:events_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:events_local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+management:
+  endpoints.web.exposure.include: health,info,metrics,prometheus
+  endpoint.health.probes.enabled: true
+bankpulse:
+  events:
+    hold-ttl-seconds: ${EVENT_HOLD_TTL_SECONDS:300}

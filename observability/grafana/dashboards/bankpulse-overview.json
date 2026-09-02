@@ -1,0 +1,14 @@
+{
+  "annotations":{"list":[]},"editable":true,"graphTooltip":1,
+  "panels":[
+    {"type":"stat","title":"Platform Services UP","id":1,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"sum(up{job=~\".*-api\"})","refId":"A"}],"fieldConfig":{"defaults":{"min":0,"max":6},"overrides":[]},"gridPos":{"h":5,"w":6,"x":0,"y":0}},
+    {"type":"stat","title":"Platform Services Expected","id":2,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"count(up{job=~\".*-api\"})","refId":"A"}],"fieldConfig":{"defaults":{"min":0,"max":6},"overrides":[]},"gridPos":{"h":5,"w":6,"x":6,"y":0}},
+    {"type":"timeseries","title":"HTTP requests / second","id":3,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"sum by (job) (rate(http_server_requests_seconds_count[1m]))","legendFormat":"{{job}}","refId":"A"}],"gridPos":{"h":8,"w":12,"x":12,"y":0}},
+    {"type":"timeseries","title":"JVM heap used by service","id":4,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"sum by (job) (jvm_memory_used_bytes{area=\"heap\"})","legendFormat":"{{job}}","refId":"A"}],"fieldConfig":{"defaults":{"unit":"bytes"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":0,"y":5}},
+    {"type":"timeseries","title":"HTTP p95 latency","id":5,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"histogram_quantile(0.95, sum by (le,job) (rate(http_server_requests_seconds_bucket[5m])))","legendFormat":"{{job}}","refId":"A"}],"fieldConfig":{"defaults":{"unit":"s"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":12,"y":8}},
+    {"type":"timeseries","title":"Container CPU","id":6,"datasource":{"type":"prometheus","uid":"${DS_PROMETHEUS}"},"targets":[{"expr":"sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[1m]))","legendFormat":"{{name}}","refId":"A"}],"gridPos":{"h":8,"w":12,"x":0,"y":13}}
+  ],
+  "refresh":"10s","schemaVersion":39,"tags":["bankpulse-v2","microservices","observability"],
+  "templating":{"list":[{"name":"DS_PROMETHEUS","type":"datasource","query":"prometheus","current":{"text":"Prometheus","value":"Prometheus"}}]},
+  "time":{"from":"now-15m","to":"now"},"timezone":"browser","title":"BANKdragon V2 Platform Overview","uid":"bankpulse-v2-overview","version":2
+}

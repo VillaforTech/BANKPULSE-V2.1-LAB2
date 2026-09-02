@@ -1,0 +1,73 @@
+{
+  "name": "BANKdragon V2.1 Interactive Platform Lab",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "forwardPorts": [
+    8080,
+    3000,
+    9090,
+    8088
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "BankPulse Interactive Banking",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    },
+    "3306": {
+      "label": "MariaDB (internal lab)",
+      "onAutoForward": "silent"
+    },
+    "27017": {
+      "label": "MongoDB (internal lab)",
+      "onAutoForward": "silent"
+    },
+    "3000": {
+      "label": "Grafana",
+      "onAutoForward": "silent",
+      "protocol": "http"
+    },
+    "9090": {
+      "label": "Prometheus",
+      "onAutoForward": "silent",
+      "protocol": "http"
+    },
+    "8088": {
+      "label": "cAdvisor",
+      "onAutoForward": "silent",
+      "protocol": "http"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-lab.sh",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.exclude": {
+          "**/target": true
+        }
+      }
+    }
+  },
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}

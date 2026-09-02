@@ -1,0 +1,6 @@
+# Replace @architecture-team with your real GitHub team/user before enforcing reviews.
+/docs/architecture/ @architecture-team
+/docs/adr/ @architecture-team
+/compose.yaml @architecture-team
+/.github/workflows/ @architecture-team
+/services/payments-api/ @architecture-team

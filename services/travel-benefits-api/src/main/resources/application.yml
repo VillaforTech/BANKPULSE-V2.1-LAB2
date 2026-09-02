@@ -1,0 +1,13 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: travel-benefits-api
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://root:mongo_local@localhost:27017/travel?authSource=admin}
+management:
+  endpoints.web.exposure.include: health,info,metrics,prometheus
+  endpoint.health.probes.enabled: true
+travel:
+  credential-secret: ${TRAVEL_CREDENTIAL_SECRET:bankpulse-local-demo-secret}

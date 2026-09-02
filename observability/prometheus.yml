@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs: [{targets: ["prometheus:9090"]}]
+
+  - job_name: payments-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["payments-api:8081"]}]
+
+  - job_name: audit-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["audit-api:8082"]}]
+
+  - job_name: experiences-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["experiences-api:8083"]}]
+
+  - job_name: travel-benefits-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["travel-benefits-api:8084"]}]
+
+  - job_name: events-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["events-api:8085"]}]
+
+  - job_name: social-split-api
+    metrics_path: /actuator/prometheus
+    static_configs: [{targets: ["social-split-api:8086"]}]
+
+  - job_name: cadvisor
+    static_configs: [{targets: ["cadvisor:8080"]}]

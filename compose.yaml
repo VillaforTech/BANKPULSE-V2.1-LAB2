@@ -1,0 +1,173 @@
+name: bankpulse-v2
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-bankpulse}
+      MARIADB_USER: ${MARIADB_USER:-bankpulse}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-bankpulse_local}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root_local_only}
+    volumes: [mariadb-data:/var/lib/mysql]
+    ports: ["127.0.0.1:3306:3306"]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [bankpulse]
+
+  mongo:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-mongo_local}
+    volumes: [mongo-data:/data/db]
+    ports: ["127.0.0.1:27017:27017"]
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' -u $$MONGO_INITDB_ROOT_USERNAME -p $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin | grep 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [bankpulse]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bankpulse_domains}
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-bankpulse_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-bankpulse_admin_local}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres-init:/docker-entrypoint-initdb.d:ro
+    ports: ["127.0.0.1:5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [bankpulse]
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  audit-api:
+    build: ./services/audit-api
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-mongo_local}@mongo:27017/audit?authSource=admin
+    depends_on:
+      mongo: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  payments-api:
+    build: ./services/payments-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/${MARIADB_DATABASE:-bankpulse}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USER:-bankpulse}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD:-bankpulse_local}
+      AUDIT_BASE_URL: http://audit-api:8082
+    depends_on:
+      mariadb: {condition: service_healthy}
+      audit-api: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  experiences-api:
+    build: ./services/experiences-api
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-mongo_local}@mongo:27017/experiences?authSource=admin
+    depends_on:
+      mongo: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  travel-benefits-api:
+    build: ./services/travel-benefits-api
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-mongo_local}@mongo:27017/travel?authSource=admin
+      TRAVEL_CREDENTIAL_SECRET: ${TRAVEL_CREDENTIAL_SECRET:-bankpulse-local-demo-secret}
+    depends_on:
+      mongo: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8084/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  events-api:
+    build: ./services/events-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-bankpulse_domains}?currentSchema=events
+      SPRING_DATASOURCE_USERNAME: events_owner
+      SPRING_DATASOURCE_PASSWORD: ${EVENTS_DB_PASSWORD:-events_local}
+      SPRING_DATA_REDIS_HOST: redis
+      EVENT_HOLD_TTL_SECONDS: ${EVENT_HOLD_TTL_SECONDS:-300}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8085/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  social-split-api:
+    build: ./services/social-split-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-bankpulse_domains}?currentSchema=social_split
+      SPRING_DATASOURCE_USERNAME: split_owner
+      SPRING_DATASOURCE_PASSWORD: ${SPLIT_DB_PASSWORD:-split_local}
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8086/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [bankpulse]
+
+  console:
+    build: ./frontend
+    ports: ["8080:8080"]
+    depends_on:
+      payments-api: {condition: service_healthy}
+      audit-api: {condition: service_healthy}
+      experiences-api: {condition: service_healthy}
+      travel-benefits-api: {condition: service_healthy}
+      events-api: {condition: service_healthy}
+      social-split-api: {condition: service_healthy}
+    networks: [bankpulse]
+
+networks:
+  bankpulse:
+    name: bankpulse-network
+    driver: bridge
+
+volumes:
+  mariadb-data:
+  mongo-data:
+  postgres-data:
+  redis-data:

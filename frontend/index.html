@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="BANKdragon BankPulse V2.1 Interactive Banking Experience">
+  <title>BANKdragon · BankPulse V2.1</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/usfq-logo.png" alt="USFQ" class="brand-logo">
+        <div><strong>BANK<span>dragon</span></strong><small>BankPulse V2.1</small></div>
+      </div>
+      <nav class="nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="home"><span>⌂</span>Inicio</button>
+        <button class="nav-item" data-view="experiences"><span>🍽</span>Experiencias</button>
+        <button class="nav-item" data-view="travel"><span>✈</span>Viajes</button>
+        <button class="nav-item" data-view="events"><span>🎫</span>Eventos</button>
+        <button class="nav-item" data-view="split"><span>◎</span>Social Split</button>
+        <div class="nav-divider"></div>
+        <button class="nav-item" data-view="platform"><span>◫</span>Platform</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="dot" id="sidebarDot"></span>
+        <div><strong id="sidebarHealth">Comprobando</strong><small>6 microservicios</small></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <span class="breadcrumb">BANKdragon / <b id="viewTitle">Inicio</b></span>
+        </div>
+        <div class="top-actions">
+          <div class="mode-switch" role="group" aria-label="Modo de experiencia">
+            <button id="clientMode" class="mode active">Cliente</button>
+            <button id="architectMode" class="mode">Arquitecto</button>
+          </div>
+          <button class="icon-button" id="refreshAll" title="Actualizar">↻</button>
+          <div class="profile"><span class="avatar">RA</span><div><strong>Socio Premium</strong><small>MEMBER-001</small></div></div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-home">
+        <div class="welcome-row">
+          <div><span class="kicker">BANCA DIGITAL + EXPERIENCIAS</span><h1>Buenas noches, Roberto</h1><p>Opera servicios reales de BANKdragon y observa cómo responde la arquitectura.</p></div>
+          <div class="system-pill"><span class="pulse-dot"></span><div><small>PLATFORM STATUS</small><strong id="platformStatus">CHECKING</strong></div></div>
+        </div>
+
+        <div class="summary-grid">
+          <article class="balance-card primary-card"><small>Saldo disponible</small><strong>$12,450.00</strong><span>Cuenta BANKdragon Premium · **** 4242</span><div class="balance-actions"><button data-goto="experiences">Explorar beneficios</button><button class="secondary" data-goto="split">Dividir gasto</button></div></article>
+          <article class="metric-card"><span class="metric-icon">↗</span><small>Pagos registrados</small><strong id="paymentCount">0</strong><p>Fuente: payments-api</p></article>
+          <article class="metric-card"><span class="metric-icon">⌁</span><small>Eventos de auditoría</small><strong id="auditCount">0</strong><p>Fuente: audit-api</p></article>
+          <article class="metric-card"><span class="metric-icon">⚡</span><small>Outbox pendiente</small><strong id="pendingCount">—</strong><p>Consistencia eventual</p></article>
+        </div>
+
+        <div class="content-grid two-thirds">
+          <article class="card">
+            <div class="card-head"><div><span class="kicker">OPERACIÓN REAL</span><h2>Movimientos recientes</h2></div><button class="text-button" data-goto="platform">Ver arquitectura →</button></div>
+            <div id="recentPayments" class="transactions"><div class="empty-state">Aún no hay pagos. Crea uno desde Social Split o una experiencia.</div></div>
+          </article>
+          <article class="card service-card">
+            <div class="card-head"><div><span class="kicker">SERVICE MESH VIEW</span><h2>Servicios</h2></div><span class="tiny-badge">LIVE</span></div>
+            <div id="homeHealth" class="health-list"></div>
+          </article>
+        </div>
+
+        <div class="feature-strip">
+          <button data-goto="experiences"><span>🍽</span><div><strong>Experiencias</strong><small>Catálogo y beneficios</small></div><b>→</b></button>
+          <button data-goto="travel"><span>✈</span><div><strong>Viajes</strong><small>Credencial offline</small></div><b>→</b></button>
+          <button data-goto="events"><span>🎫</span><div><strong>Eventos</strong><small>Seat Hold + TTL</small></div><b>→</b></button>
+          <button data-goto="split"><span>◎</span><div><strong>Social Split</strong><small>Pago colaborativo</small></div><b>→</b></button>
+        </div>
+      </section>
+
+      <section class="view" id="view-experiences">
+        <div class="page-head"><div><span class="kicker">ÉPICA 1 · GASTRONOMÍA</span><h1>Experiencias exclusivas</h1><p>Datos reales desde <code>experiences-api</code>. Selecciona una experiencia y genera una garantía de pago.</p></div><div class="architecture-chip">MongoDB · experiences</div></div>
+        <div id="experiencesGrid" class="experience-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div></div>
+        <article class="card architect-only architecture-note"><strong>Decisión arquitectónica</strong><p><code>experiences-api</code> posee catálogo y capacidad. El pago pertenece a <code>payments-api</code>; la UI solo crea una garantía demo y conserva la referencia.</p></article>
+      </section>
+
+      <section class="view" id="view-travel">
+        <div class="page-head"><div><span class="kicker">ÉPICA 2 · VIAJES</span><h1>Beneficios sin fricción</h1><p>Valida elegibilidad y genera una credencial firmada para demostrar el patrón offline.</p></div><label class="network-toggle"><span>NETWORK</span><input type="checkbox" id="offlineToggle"><i></i><b id="networkLabel">ONLINE</b></label></div>
+        <div class="content-grid half">
+          <article class="card travel-card">
+            <div class="card-head"><div><span class="kicker">MEMBER ELIGIBILITY</span><h2>Acceso Lounge</h2></div><span class="travel-icon">✈</span></div>
+            <label class="field">Member ID<input id="travelMember" value="MEMBER-001"></label>
+            <button class="primary-button" id="checkEligibility">Validar elegibilidad</button>
+            <div id="eligibilityResult" class="result-box">Listo para consultar travel-benefits-api.</div>
+          </article>
+          <article class="credential-card" id="credentialCard">
+            <div class="credential-top"><span>BANKdragon TRAVEL</span><b>PREMIUM</b></div>
+            <div class="qr" id="credentialQr"></div>
+            <strong id="credentialMember">Sin credencial</strong>
+            <small id="credentialBenefit">Genera una credencial para operar offline</small>
+            <div class="credential-status"><span class="dot"></span><span id="credentialMode">ONLINE REQUIRED</span></div>
+          </article>
+        </div>
+        <article class="card architect-only architecture-note"><strong>Consistencia eventual</strong><p>La credencial puede verificarse localmente. Un redemption creado offline debe sincronizarse posteriormente y tolerar reintentos/idempotencia.</p></article>
+      </section>
+
+      <section class="view" id="view-events">
+        <div class="page-head"><div><span class="kicker">ÉPICA 3 · EVENTOS PREMIUM</span><h1>Preventa interactiva</h1><p>Selecciona un asiento. El HOLD se crea realmente en Redis usando <code>SET NX + TTL</code>.</p></div><div class="architecture-chip">PostgreSQL + Redis TTL</div></div>
+        <div class="content-grid event-layout">
+          <article class="card seat-card">
+            <div class="event-title"><div><span class="tiny-badge">PRE-SALE</span><h2 id="eventName">Cargando evento…</h2><p id="eventVenue">—</p></div><div class="legend"><span><i class="available"></i>Libre</span><span><i class="held"></i>HOLD</span><span><i class="mine"></i>Tu selección</span></div></div>
+            <div class="stage">ESCENARIO</div>
+            <div id="seatMap" class="seat-map"></div>
+          </article>
+          <article class="card hold-panel">
+            <span class="kicker">SEAT HOLD</span><h2 id="selectedSeat">Selecciona un asiento</h2>
+            <p>Member: <strong>MEMBER-001</strong></p>
+            <div class="countdown"><small>TTL restante</small><strong id="holdCountdown">--:--</strong></div>
+            <div id="holdResult" class="result-box">La operación mostrará un HTTP 201 o un conflicto HTTP 409.</div>
+            <button class="danger-button" id="releaseHold" disabled>Liberar HOLD</button>
+          </article>
+        </div>
+        <article class="card architect-only trace-card"><div class="card-head"><div><span class="kicker">ARCHITECT TRACE</span><h2>Flujo de reserva</h2></div><span class="tiny-badge">TEACHING TRACE</span></div><div class="flow"><span>Browser</span><b>→</b><span>Nginx Edge</span><b>→</b><span>events-api</span><b>→</b><span>Redis SET NX</span><b>→</b><span>TTL</span></div><p>Este trazo representa el contrato de arquitectura; no sustituye distributed tracing/OpenTelemetry.</p></article>
+      </section>
+
+      <section class="view" id="view-split">
+        <div class="page-head"><div><span class="kicker">ÉPICA 4 · SOCIAL SPLIT</span><h1>Consumo colaborativo</h1><p>Crea una sesión real, agrega participantes, genera pagos y autoriza cada parte antes del cierre.</p></div><div class="architecture-chip">PostgreSQL · social_split</div></div>
+        <div class="content-grid split-layout">
+          <article class="card">
+            <div class="card-head"><div><span class="kicker">NUEVA SESIÓN</span><h2>Dividir cuenta</h2></div><span class="split-icon">◎</span></div>
+            <div class="form-grid"><label class="field">Total<input id="splitTotal" type="number" value="180" min="1" step="0.01"></label><label class="field">Participantes<select id="splitPeople"><option>2</option><option selected>4</option><option>5</option></select></label></div>
+            <button class="primary-button" id="createSplit">Crear sesión demo</button>
+            <div id="splitMessage" class="result-box">La sesión aparecerá aquí con estados reales del backend.</div>
+          </article>
+          <article class="card split-session-card">
+            <div class="card-head"><div><span class="kicker">LIVE SESSION</span><h2 id="splitSessionTitle">Sin sesión</h2></div><span class="status-badge" id="splitStatus">—</span></div>
+            <div class="split-progress"><div><i id="splitProgressBar"></i></div><strong id="splitProgressText">$0 / $0</strong></div>
+            <div id="splitParticipants" class="participants"><div class="empty-state">Crea una sesión para comenzar.</div></div>
+            <button class="success-button" id="closeSplit" disabled>Finalizar cuenta</button>
+          </article>
+        </div>
+        <article class="card architect-only architecture-note"><strong>Data ownership</strong><p><code>social-split-api</code> posee la sesión y los participantes. Cada autorización utiliza una <code>paymentReference</code>; la transacción financiera sigue siendo propiedad de <code>payments-api</code>.</p></article>
+      </section>
+
+      <section class="view" id="view-platform">
+        <div class="page-head"><div><span class="kicker">PLATFORM ENGINEERING MODE</span><h1>Arquitectura observable</h1><p>Relaciona la experiencia del usuario con servicios, datos, CI y telemetría.</p></div><div class="platform-links"><button data-port="3000">Grafana ↗</button><button data-port="9090">Prometheus ↗</button><button data-port="8088">cAdvisor ↗</button></div></div>
+        <div id="platformHealthGrid" class="platform-health-grid"></div>
+        <div class="content-grid half">
+          <article class="card architecture-map-card"><div class="card-head"><div><span class="kicker">C4 · CONTAINER VIEW</span><h2>Flujo de plataforma</h2></div><span class="tiny-badge">LIVE HEALTH</span></div>
+            <div class="architecture-map">
+              <div class="arch-node edge"><b>Web / Flutter</b><small>Cliente</small></div><span>→</span><div class="arch-node gateway"><b>Nginx Edge</b><small>:8080</small></div><span>→</span><div class="arch-stack"><div class="arch-node">Experiences</div><div class="arch-node">Travel</div><div class="arch-node">Events</div><div class="arch-node">Social Split</div><div class="arch-node">Payments</div><div class="arch-node">Audit</div></div>
+            </div>
+            <div class="data-ownership"><span>MongoDB</span><span>MariaDB</span><span>PostgreSQL</span><span>Redis</span></div>
+          </article>
+          <article class="card"><div class="card-head"><div><span class="kicker">LAST INTERACTION</span><h2>Trace de enseñanza</h2></div><button id="clearTrace" class="text-button">Limpiar</button></div><div id="traceLog" class="trace-log"><div class="empty-state">Interactúa con la aplicación para generar evidencia.</div></div></article>
+        </div>
+        <div class="content-grid half">
+          <article class="card"><div class="card-head"><div><span class="kicker">CI QUALITY GATE</span><h2>GitHub Actions</h2></div><span class="status-badge good">ENABLED</span></div><div class="ci-flow"><span>PR</span><b>→</b><span>Architecture Contract</span><b>→</b><span>Build</span><b>→</b><span>Smoke</span><b>→</b><span>Observability</span><b>→</b><span class="green">Merge</span></div><p class="muted">El pipeline real está definido en <code>.github/workflows/ci.yml</code>.</p></article>
+          <article class="card"><div class="card-head"><div><span class="kicker">CONTROLLED CHAOS</span><h2>Comandos de laboratorio</h2></div><span class="tiny-badge danger">REVERSIBLE</span></div><div class="command-list"><button data-copy="docker compose stop mongo audit-api">$ docker compose stop mongo audit-api</button><button data-copy="docker compose up -d --wait mongo audit-api">$ docker compose up -d --wait mongo audit-api</button><button data-copy="docker compose logs -f payments-api audit-api">$ docker compose logs -f payments-api audit-api</button></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

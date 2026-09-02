@@ -1,0 +1,73 @@
+name: BANKdragon V2.1 CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  architecture-contract:
+    name: Architecture contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Required deployable services
+        run: |
+          set -euo pipefail
+          for service in payments-api audit-api experiences-api travel-benefits-api events-api social-split-api; do
+            test -f "services/$service/Dockerfile"
+            test -f "services/$service/pom.xml"
+            test -f "services/$service/src/main/resources/application.yml"
+          done
+          test -f observability/compose.yaml
+          test -f observability/prometheus.yml
+          test -f observability/grafana/dashboards/bankpulse-overview.json
+          test -f docs/architecture/DATA-OWNERSHIP.md
+          test -f frontend/index.html
+          test -f frontend/app.js
+          test -f frontend/styles.css
+      - name: Validate compose models
+        run: |
+          docker compose config --quiet
+          docker compose -f observability/compose.yaml config --quiet
+
+  integration-test:
+    name: Build, integration and observability
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: architecture-contract
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start BANKdragon V2
+        run: docker compose up --build -d --wait --wait-timeout 300
+      - name: Validate interactive edge UI
+        run: |
+          curl -fsS http://localhost:8080/ | grep -q "BANKdragon"
+          curl -fsS http://localhost:8080/app.js | grep -q "Seat HOLD created"
+      - name: Domain and regression smoke tests
+        run: bash scripts/smoke-v2.sh
+      - name: Start Prometheus and Grafana
+        run: docker compose -f observability/compose.yaml up -d prometheus grafana
+      - name: Validate observability endpoints
+        run: |
+          for i in $(seq 1 30); do curl -fsS http://localhost:9090/-/healthy && break || sleep 2; done
+          curl -fsS http://localhost:9090/-/healthy
+          for i in $(seq 1 30); do curl -fsS http://localhost:3000/api/health && break || sleep 2; done
+          curl -fsS http://localhost:3000/api/health | grep -q '"database"'
+      - name: Capture evidence on failure
+        if: failure()
+        run: |
+          docker compose ps || true
+          docker compose logs --tail=250 || true
+          docker compose -f observability/compose.yaml ps || true
+          docker compose -f observability/compose.yaml logs --tail=150 || true
+      - name: Stop observability
+        if: always()
+        run: docker compose -f observability/compose.yaml down -v || true
+      - name: Stop platform
+        if: always()
+        run: docker compose down -v || true

@@ -1,0 +1,16 @@
+server:
+  port: 8086
+spring:
+  application:
+    name: social-split-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bankpulse_domains?currentSchema=social_split}
+    username: ${SPRING_DATASOURCE_USERNAME:split_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:split_local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+management:
+  endpoints.web.exposure.include: health,info,metrics,prometheus
+  endpoint.health.probes.enabled: true
