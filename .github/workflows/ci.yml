@@ -9,10 +9,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   architecture-contract:
     name: Architecture contract
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - name: Required deployable services
@@ -71,3 +76,22 @@ jobs:
       - name: Stop platform
         if: always()
         run: docker compose down -v || true
+
+  release-gate:
+    name: Release gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [architecture-contract, integration-test]
+    if: ${{ always() }}
+    steps:
+      - name: Require every CI stage to succeed
+        env:
+          ARCHITECTURE_RESULT: ${{ needs.architecture-contract.result }}
+          INTEGRATION_RESULT: ${{ needs.integration-test.result }}
+        run: |
+          set -euo pipefail
+          printf 'Architecture: %s\nIntegration: %s\n' "$ARCHITECTURE_RESULT" "$INTEGRATION_RESULT"
+          if [[ "$ARCHITECTURE_RESULT" != "success" || "$INTEGRATION_RESULT" != "success" ]]; then
+            echo "::error::Release blocked: every required stage must succeed; skipped or cancelled stages do not pass."
+            exit 1
+          fi

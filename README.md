@@ -4,6 +4,8 @@
 
 Plataforma docente de microservicios desplegables para Arquitectura de Software, DDD, DevOps, CI y Observabilidad. Esta version conserva el core financiero de BankPulse y transforma las cuatro epicas de negocio en servicios independientes con contratos, ownership de datos, health checks y metricas.
 
+**Equipo:** consulta [CONTRIBUTING.md](CONTRIBUTING.md) para el reparto del Deber 01, el flujo de ramas y los requisitos de revisión de Roberto antes de integrar a `main`.
+
 ## Arquitectura V2
 
 | Servicio | Epica / contexto | Puerto interno | Persistencia |
@@ -107,10 +109,13 @@ Prometheus scrapea `/actuator/prometheus` de los seis microservicios. El dashboa
 
 ## CI
 
-`.github/workflows/ci.yml` implementa dos puertas:
+`.github/workflows/ci.yml` implementa las siguientes comprobaciones:
 
 1. **Architecture contract:** verifica la existencia de los seis servicios, ownership docs y Compose/observabilidad validos.
 2. **Integration test:** construye el stack real, ejecuta `smoke-v2.sh`, levanta Prometheus/Grafana y valida sus health endpoints.
+3. **Release gate:** exige que ambas etapas terminen correctamente; un fallo, cancelación u omisión bloquea la integración.
+
+El gate reúne las comprobaciones actuales. La prueba de negocio contra el falso verde y las verificaciones de tiempo real del Deber 01 se desarrollan en las issues del equipo; todavía no están implementadas por este cambio de configuración.
 
 Flujo esperado:
 

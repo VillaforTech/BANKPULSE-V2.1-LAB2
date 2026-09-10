@@ -1,6 +1,3 @@
-# Replace @architecture-team with your real GitHub team/user before enforcing reviews.
-/docs/architecture/ @architecture-team
-/docs/adr/ @architecture-team
-/compose.yaml @architecture-team
-/.github/workflows/ @architecture-team
-/services/payments-api/ @architecture-team
+# Roberto reviews all team changes, including changes to this policy.
+# This file must remain on the PR base branch for GitHub to enforce ownership.
+* @VillaforTech
