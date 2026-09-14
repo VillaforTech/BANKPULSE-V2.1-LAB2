@@ -7,3 +7,7 @@ target/
 .DS_Store
 *.zip
 creation.log
+
+# Local ADR validator tests
+__pycache__/
+*.pyc

@@ -148,3 +148,8 @@ Luego use **Stop Codespace**.
 ## Seguridad
 
 No suba `.env`, tokens, claves institucionales o credenciales reales. Los passwords incluidos son solamente para un entorno local efimero de aprendizaje.
+
+## Registros de decisiones de arquitectura (ADR)
+
+ADR-Tools está incluido en el proyecto y sus registros se validan dentro de
+`architecture-contract`. Ver [instalación, comandos y alcance del control](docs/adr/README.md).
