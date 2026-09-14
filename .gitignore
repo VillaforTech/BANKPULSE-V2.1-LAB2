@@ -7,3 +7,8 @@ target/
 .DS_Store
 *.zip
 creation.log
+
+# Python del harness de aceptacion (issue #5)
+__pycache__/
+*.pyc
+.pytest_cache/
