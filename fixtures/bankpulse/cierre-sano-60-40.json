@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "descripcion": "Fixture de referencia para el issue #5: sesion de Social Split con cierre SANO. Total 100.00 USD repartido en cuotas de 60.00 y 40.00, ambas autorizadas con referencia de pago no vacia. Las cuotas suman exactamente el total, por lo que este cierre es valido segun la regla de negocio (aunque hoy closeIfAuthorized() no la exija; ver issue #1).",
+  "sesion": {
+    "id": "fixture-sano-60-40",
+    "hostMemberId": "MEMBER-FIXTURE-SANO",
+    "totalAmount": "100.00",
+    "currency": "USD",
+    "status": "COMPLETED",
+    "createdAt": "2026-01-01T12:00:00Z",
+    "closedAt": "2026-01-01T12:05:00Z",
+    "participants": [
+      {
+        "id": "fixture-sano-p1",
+        "memberId": "MEMBER-A",
+        "shareAmount": "60.00",
+        "authorized": true,
+        "paymentReference": "PAY-REF-SANO-1"
+      },
+      {
+        "id": "fixture-sano-p2",
+        "memberId": "MEMBER-B",
+        "shareAmount": "40.00",
+        "authorized": true,
+        "paymentReference": "PAY-REF-SANO-2"
+      }
+    ]
+  },
+  "kpisEsperados": {
+    "ventanaSegundosBK1BK2": 900,
+    "edadMinSegundosBK3": 120,
+    "bK1": 100.0,
+    "bK2": {
+      "USD": "0"
+    },
+    "bK3": {}
+  }
+}

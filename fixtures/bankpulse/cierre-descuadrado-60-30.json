@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "descripcion": "Fixture de referencia para el issue #5: el FALSO VERDE de extremo a extremo. Sesion de Social Split con total 100.00 USD, cerrada con cuotas autorizadas de 60.00 y 30.00 (suman 90.00, descuadre de 10.00). Hoy closeIfAuthorized() SOLO valida que los participantes existan y esten todos autorizados; NO valida que la suma de cuotas sea igual a totalAmount, asi que la API real deja este cierre en status COMPLETED con HTTP 2xx. Esta fixture documenta el resultado ESPERADO de los KPIs de negocio (issue #5), no lo que la API deberia responder (eso es correccion del issue #1).",
+  "sesion": {
+    "id": "fixture-descuadrado-60-30",
+    "hostMemberId": "MEMBER-FIXTURE-DESCUADRADO",
+    "totalAmount": "100.00",
+    "currency": "USD",
+    "status": "COMPLETED",
+    "createdAt": "2026-01-01T12:00:00Z",
+    "closedAt": "2026-01-01T12:05:00Z",
+    "participants": [
+      {
+        "id": "fixture-descuadrado-p1",
+        "memberId": "MEMBER-A",
+        "shareAmount": "60.00",
+        "authorized": true,
+        "paymentReference": "PAY-REF-DESCUADRE-1"
+      },
+      {
+        "id": "fixture-descuadrado-p2",
+        "memberId": "MEMBER-B",
+        "shareAmount": "30.00",
+        "authorized": true,
+        "paymentReference": "PAY-REF-DESCUADRE-2"
+      }
+    ]
+  },
+  "kpisEsperados": {
+    "ventanaSegundosBK1BK2": 900,
+    "edadMinSegundosBK3": 120,
+    "bK1": 0.0,
+    "bK2": {
+      "USD": "10.00"
+    },
+    "bK3": {},
+    "notaFalsoVerde": "HTTP 2xx + status COMPLETED + descuadre de 10.00 unidades: este es el falso verde que scripts/acceptance/business_test_social_split.py debe detectar y fallar."
+  }
+}
