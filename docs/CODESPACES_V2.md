@@ -1,6 +1,6 @@
-# BankPulse Lab v2 - Codespaces
+# BankPulse V2 — Codespaces
 
-Esta version incorpora la correccion del Dev Container descubierta durante la validacion del laboratorio.
+Esta versión incorpora la corrección del Dev Container descubierta durante la validación del entorno.
 
 ## Correccion Yarn
 
@@ -37,7 +37,7 @@ docker compose -f observability/compose.yaml ps
 
 Servicios esperados: cAdvisor 8088, Prometheus 9090 y Grafana 3000.
 
-Grafana del laboratorio: usuario `admin`; password `bankpulse_demo` (credencial exclusivamente academica).
+Grafana local: usuario `admin`; password `bankpulse_demo` (credencial de desarrollo que no debe exponerse ni reutilizarse).
 
 ## Apagado
 

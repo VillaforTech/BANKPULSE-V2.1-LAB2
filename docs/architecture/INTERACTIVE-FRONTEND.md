@@ -33,10 +33,10 @@ Adds educational explanations:
 - ownership boundaries;
 - C4-like container flow;
 - health of all six services;
-- teaching trace based on UI requests;
+- client-observed request trace based on UI calls;
 - links to real Prometheus/Grafana/cAdvisor.
 
-The teaching trace is intentionally not called distributed tracing. It records the path the UI invoked and measured client-perceived latency. OpenTelemetry can be added later as a DevSecOps/observability evolution.
+The client-observed trace is intentionally not called distributed tracing. It records the path the UI invoked and its perceived latency. OpenTelemetry can be added later as an observability evolution.
 
 ## Domain interactions
 
@@ -44,7 +44,7 @@ The teaching trace is intentionally not called distributed tracing. It records t
 The UI reads `experiences-api`. A guarantee demo creates a payment using `payments-api`. The financial transaction remains owned by Payments.
 
 ### Travel
-The UI obtains eligibility and a signed demo credential. The last credential is stored in browser local storage only to illustrate an offline-first experience. This is a teaching mechanism, not a production credential wallet.
+The UI obtains eligibility and a signed demo credential. The last credential is stored in browser local storage only to demonstrate an offline-first experience. It is not a production credential wallet.
 
 ### Events
 The seat map calls the real Events API. Holds are atomic Redis SET-if-absent values with TTL. `GET /api/events/{eventId}/holds` exists only as lab introspection for rendering active holds. Its current Redis `KEYS` implementation must not be copied to large production datasets.
@@ -60,4 +60,4 @@ The UI creates the Split Session in `social-split-api`. When a participant autho
 - Grafana demo credentials remain lab-only.
 
 ## Production evolution
-For a production-grade architecture, evolve the edge into an API Gateway/BFF, replace teaching trace with OpenTelemetry, move cross-domain orchestration out of the browser, introduce OIDC/JWT, and use a secret manager.
+For a production-grade architecture, evolve the edge into an API Gateway/BFF, replace the client trace with OpenTelemetry, move cross-domain orchestration out of the browser, introduce OIDC/JWT, and use a secret manager.

@@ -1,150 +1,128 @@
-# BANKdragon / BankPulse V2.1 — Interactive Banking Experience
+# BankPulse — Event-driven banking experiences
 
-> **V2.1:** además de la plataforma de microservicios, el puerto `8080` ofrece una experiencia bancaria interactiva con modos Cliente/Arquitecto, gastronomía, viajes offline, seat holds, Social Split y visualización de arquitectura. Todo consume APIs reales del laboratorio.
+BankPulse is a distributed banking platform that explores how payments, premium experiences, travel benefits, event reservations and shared expenses can coexist behind one customer-facing application. The project combines domain-oriented services with reliable event delivery, live business observability and automated release controls.
 
-Plataforma docente de microservicios desplegables para Arquitectura de Software, DDD, DevOps, CI y Observabilidad. Esta version conserva el core financiero de BankPulse y transforma las cuatro epicas de negocio en servicios independientes con contratos, ownership de datos, health checks y metricas.
+The browser experience on port `8080` has two views: **Customer** presents the product journey, while **Architect** exposes service health, ownership boundaries and operational signals. Both views call the running APIs; the interface is not a static mock.
 
-**Equipo:** consulta [CONTRIBUTING.md](CONTRIBUTING.md) para el reparto del Deber 01, el flujo de ramas y los requisitos de revisión de Roberto antes de integrar a `main`.
+> **Project status:** the platform foundation and integration branch are green. The team is completing the domain event pipeline, recoverable analytics, Grafana Live panels and end-to-end acceptance harness. A separate reference implementation documents the target behavior without claiming those contributions for the team.
 
-## Arquitectura V2
+## Product experience
 
-| Servicio | Epica / contexto | Puerto interno | Persistencia |
-|---|---|---:|---|
-| `payments-api` | Core financiero | 8081 | MariaDB |
-| `audit-api` | Auditoria | 8082 | MongoDB `audit` |
-| `experiences-api` | Gastronomia | 8083 | MongoDB `experiences` |
-| `travel-benefits-api` | Viajes | 8084 | MongoDB `travel` |
-| `events-api` | Eventos premium | 8085 | PostgreSQL `events` + Redis TTL |
-| `social-split-api` | Social Split | 8086 | PostgreSQL `social_split` |
-| `console` | Edge + UI | 8080 host | Nginx |
+- **Payments:** create idempotent payment intents and correlate financial state with audit events.
+- **Experiences:** discover dining benefits and create a demo payment guarantee.
+- **Travel benefits:** evaluate eligibility, issue a signed credential and demonstrate offline verification.
+- **Events:** reserve seats with Redis-backed holds, visible expiration and conflict handling.
+- **Social Split:** create a group expense, add participants, authorize shares and close only when the total is consistent.
+- **Platform view:** inspect service health, data ownership and links to Grafana, Prometheus and cAdvisor.
 
-Los puertos 8081-8086 permanecen dentro de la red Docker. El navegador entra por `console:8080`, que funciona como edge/reverse proxy de laboratorio.
+All accounts, amounts and authorizations are synthetic. An `ACCEPTED` payment represents a simulated workflow, not a real charge or settlement.
 
+## Architecture
 
-## Frontend interactivo V2.1
-
-La UI del puerto `8080` ahora permite recorrer las cuatro épicas desde una experiencia bancaria:
-
-- **Experiencias:** consulta MongoDB a través de `experiences-api` y genera una garantía demo en `payments-api`.
-- **Viajes:** consulta elegibilidad, emite credencial firmada y permite demostrar disponibilidad offline local.
-- **Eventos:** renderiza un mapa de asientos y crea HOLDs reales en Redis con TTL; un segundo intento obtiene HTTP 409.
-- **Social Split:** crea sesiones/participantes reales, usa referencias de pagos y aplica la invariante de cierre.
-- **Platform:** muestra health de seis servicios, C4 simplificado, ownership y enlaces a la observabilidad real.
-
-Use el selector **Cliente / Arquitecto** para alternar entre experiencia de usuario y explicaciones técnicas.
-
-## Data ownership
-
-La V2 aplica **single-writer ownership**. Compartir un motor fisico en Codespaces no significa compartir modelo de datos:
-
-- `payments-api` es la unica autoridad financiera.
-- `events-api` posee eventos y holds; Redis solo contiene estado temporal.
-- `social-split-api` almacena referencias de pago, no transacciones financieras.
-- `experiences-api` y `travel-benefits-api` usan bases Mongo separadas.
-- `audit-api` es una proyeccion de auditoria y no modifica dominios de origen.
-
-Consulte `docs/architecture/DATA-OWNERSHIP.md` y use `docs/adr/ADR-TEMPLATE-DATA-OWNERSHIP.md` como entregable de equipo.
-
-## Inicio rapido en GitHub Codespaces
-
-El Dev Container incluye el fix de Yarn requerido por Docker-in-Docker:
-
-```dockerfile
-FROM mcr.microsoft.com/devcontainers/java:1-21-bookworm
-RUN rm -f /etc/apt/sources.list.d/yarn.list
+```mermaid
+flowchart LR
+    U[Customer / Architect UI] --> E[Nginx edge :8080]
+    E --> P[Payments API]
+    E --> X[Experiences API]
+    E --> T[Travel Benefits API]
+    E --> V[Events API]
+    E --> S[Social Split API]
+    P --> M[(MariaDB)]
+    P --> O[Transactional outbox]
+    O --> A[Audit API]
+    A --> G[(MongoDB)]
+    V --> R[(PostgreSQL + Redis)]
+    S --> SP[(PostgreSQL)]
+    S --> B[Redpanda]
+    B --> Q[Business analytics]
+    Q --> L[Grafana Live]
+    P & A & X & T & V & S --> PM[Prometheus]
 ```
 
-1. Abra **Code -> Codespaces -> Create codespace on main**.
-2. Espere el build inicial de los servicios.
-3. Verifique:
+| Component | Responsibility | Storage |
+| --- | --- | --- |
+| `payments-api` | Idempotent payment workflow and financial authority | MariaDB |
+| `audit-api` | Audit projection from confirmed payment facts | MongoDB `audit` |
+| `experiences-api` | Dining benefits and experience catalogue | MongoDB `experiences` |
+| `travel-benefits-api` | Eligibility and demo travel credentials | MongoDB `travel` |
+| `events-api` | Events, seats and temporary holds | PostgreSQL + Redis |
+| `social-split-api` | Shared-expense aggregate and payment references | PostgreSQL |
+| `business-analytics` | Replayable business projection and freshness state | Owned analytics store |
+| `console` | Product UI and HTTP edge | Nginx |
 
-```bash
-docker --version
-docker compose version
-docker compose ps
-```
+Each bounded context owns its writes. Sharing a database engine in a constrained development environment does not grant services access to another context's tables. See [data ownership](docs/architecture/DATA-OWNERSHIP.md) and the [technical blueprint](docs/architecture/TECHNICAL-BLUEPRINT.md).
 
-4. Abra el puerto **8080** reenviado por Codespaces.
+## Run locally
 
-No se requiere IP del Codespace.
-
-## Inicio manual
+Requirements: Docker with Compose v2 and about 8 GB available to Docker.
 
 ```bash
 cp .env.example .env
-docker compose config
-docker compose up -d --build --wait
-docker compose ps
-```
-
-Prueba integral:
-
-```bash
+COMPOSE_BAKE=false COMPOSE_PARALLEL_LIMIT=2 docker compose up -d --build --wait --wait-timeout 300
 bash scripts/smoke-v2.sh
 ```
 
-## Observabilidad
+Open <http://localhost:8080>. The service ports remain private inside the Compose network.
 
-El stack se mantiene separado de la aplicacion:
+Start the observability stack separately:
 
 ```bash
 docker compose -f observability/compose.yaml up -d
-docker compose -f observability/compose.yaml ps
 ```
 
-Puertos de Codespaces:
+| Surface | Local URL |
+| --- | --- |
+| Product console | <http://localhost:8080> |
+| Grafana | <http://localhost:3000> |
+| Prometheus | <http://localhost:9090> |
+| cAdvisor | <http://localhost:8088> |
 
-- 3000: Grafana
-- 9090: Prometheus
-- 8088: cAdvisor
+The checked-in Grafana account is only for local development. Do not expose this configuration publicly or reuse its credentials.
 
-Grafana demo:
-
-- usuario: `admin`
-- password: `bankpulse_demo`
-
-Estas credenciales son exclusivamente docentes. Para produccion use un secret manager.
-
-Prometheus scrapea `/actuator/prometheus` de los seis microservicios. El dashboard `BANKdragon V2 Platform Overview` incluye disponibilidad, throughput HTTP, heap JVM, p95 y CPU de contenedores.
-
-## CI
-
-`.github/workflows/ci.yml` implementa las siguientes comprobaciones:
-
-1. **Architecture contract:** verifica la existencia de los seis servicios, ownership docs y Compose/observabilidad validos.
-2. **Integration test:** construye el stack real, ejecuta `smoke-v2.sh`, levanta Prometheus/Grafana y valida sus health endpoints.
-3. **Release gate:** exige que ambas etapas terminen correctamente; un fallo, cancelación u omisión bloquea la integración.
-
-El gate reúne las comprobaciones actuales. La prueba de negocio contra el falso verde y las verificaciones de tiempo real del Deber 01 se desarrollan en las issues del equipo; todavía no están implementadas por este cambio de configuración.
-
-Flujo esperado:
-
-```text
-feature/* -> Pull Request -> GitHub Actions -> CI verde -> review -> squash merge -> main
-```
-
-CI no significa deployment. El workflow demuestra integrabilidad y calidad automatizada; CD puede incorporarse posteriormente con GHCR + Argo CD/Kubernetes.
-
-## Distribucion por equipos
-
-- Equipo Gastronomia -> `services/experiences-api`
-- Equipo Viajes -> `services/travel-benefits-api`
-- Equipo Eventos -> `services/events-api`
-- Equipo Social Split -> `services/social-split-api`
-
-Cada equipo debe entregar DDD, C4, ADR de Data Ownership, implementacion, tests, evidencia CI y metricas operacionales.
-
-## Recursos de Codespaces
-
-La configuracion objetivo es 4 CPU / 8 GB. La persistencia comparte motores fisicos para no multiplicar consumo, manteniendo aislamiento logico. Al terminar:
+Stop the environment without deleting its volumes:
 
 ```bash
 docker compose -f observability/compose.yaml down
 docker compose down
 ```
 
-Luego use **Stop Codespace**.
+For a disposable hosted environment, follow the [Codespaces guide](docs/CODESPACES.md).
 
-## Seguridad
+## Quality and release controls
 
-No suba `.env`, tokens, claves institucionales o credenciales reales. Los passwords incluidos son solamente para un entorno local efimero de aprendizaje.
+Pull requests pass through architecture, unit, integration and release checks. The integration suite builds the actual stack, checks health and readiness, exercises idempotency and observability, and preserves evidence before teardown. When the team acceptance harness is present, skipped resilience checks or API-only latency measurements fail the release.
+
+The target business flow also proves a deliberate **false green**: infrastructure can remain healthy while a business invariant is broken. The required gate must block that revision, then pass only after the business correction. This gives the project a stronger signal than a conventional “containers are up” demo.
+
+```text
+feature branch -> pull request -> automated checks -> teammate review -> squash merge
+```
+
+See [CONTRIBUTING](CONTRIBUTING.md) for the workflow and [TEAM-INTEGRATION](docs/TEAM-INTEGRATION.md) for the event, analytics and acceptance contracts.
+
+## Team
+
+BankPulse is developed as a shared portfolio project. Credit follows merged code and reviewed evidence; an assignment alone is not treated as a completed contribution.
+
+| Contributor | Workstream |
+| --- | --- |
+| [Nicolás](https://github.com/nikotov) | Domain rules, event contracts and reliable outbox publication |
+| [Daniel Salazar](https://github.com/DanielSalazar0710) | Continuous analytics, deduplication and recoverable state |
+| [oandretty010](https://github.com/oandretty010) | Grafana Live adapter, dashboards and reconnect behavior |
+| [Roberto Villafuerte](https://github.com/VillaforTech) | Platform integration, Compose, CI and release controls |
+| [Daniel Martínez](https://github.com/Dmt-155lbs) | End-to-end, resilience, latency and evidence automation |
+
+The current implementation status and next action for each workstream live in [GitHub Issues](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues).
+
+## Engineering documentation
+
+- [Architecture and ownership](docs/architecture/)
+- [Operations runbook](docs/RUNBOOK.md)
+- [Test plan](docs/TEST-PLAN-V2.1.md)
+- [Observability](observability/README.md)
+- [Security policy](SECURITY.md)
+- [Release notes](RELEASE-NOTES.md)
+
+## Project context
+
+BankPulse also serves as a graded software-engineering case study. The course requirements shape the review process, reproducibility, evidence and release-gate scenarios, but the repository is maintained as a standalone portfolio product. Course-specific records remain under `docs/` so the public project story and the assessment trail are both explicit.
