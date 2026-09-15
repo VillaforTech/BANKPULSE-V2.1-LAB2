@@ -1,6 +1,28 @@
 name: bankpulse-v2
 
 services:
+  business-topics:
+    image: redpandadata/redpanda:v24.3.18
+    depends_on:
+      redpanda: {condition: service_healthy}
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        rpk topic describe bankpulse.social-split.events.v1 --brokers redpanda:9092 >/dev/null 2>&1 || rpk topic create bankpulse.social-split.events.v1 --brokers redpanda:9092 --partitions 1 --replicas 1 -c retention.ms=86400000
+        rpk topic describe bankpulse.social-split.events.v1 --brokers redpanda:9092
+    networks: [bankpulse]
+
+  redpanda:
+    image: redpandadata/redpanda:v24.3.18
+    command: ["redpanda", "start", "--overprovisioned", "--smp", "1", "--memory", "512M", "--reserve-memory", "0M", "--node-id", "0", "--check=false", "--kafka-addr", "PLAINTEXT://0.0.0.0:9092", "--advertise-kafka-addr", "PLAINTEXT://redpanda:9092"]
+    volumes: [redpanda-data:/var/lib/redpanda/data]
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health", "--exit-when-healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [bankpulse]
+
   mariadb:
     image: mariadb:11.4
     environment:
@@ -167,6 +189,7 @@ networks:
     driver: bridge
 
 volumes:
+  redpanda-data:
   mariadb-data:
   mongo-data:
   postgres-data:

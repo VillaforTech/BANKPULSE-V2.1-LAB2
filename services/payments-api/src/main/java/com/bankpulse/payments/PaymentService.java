@@ -27,8 +27,9 @@ public class PaymentService {
     }
 
     private Payment persist(String idempotencyKey, PaymentController.PaymentRequest request) {
-        Instant now = Instant.now();
-        Payment payment = new Payment(UUID.randomUUID().toString(), idempotencyKey, request.account(), request.amount(), request.currency().toUpperCase(), "ACCEPTED", now);
+        // MariaDB persists microseconds; use one canonical millisecond value in response and outbox.
+        Instant now = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
+        Payment payment = new Payment(UUID.randomUUID().toString(), idempotencyKey, request.account(), request.amount().setScale(2), request.currency().toUpperCase(java.util.Locale.ROOT), "ACCEPTED", now);
         payments.save(payment);
 
         String eventId = UUID.randomUUID().toString();
