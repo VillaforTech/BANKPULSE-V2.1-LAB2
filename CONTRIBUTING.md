@@ -73,7 +73,7 @@ The integration contract in [TEAM-INTEGRATION](docs/TEAM-INTEGRATION.md) defines
 
 ## Using the reference implementation
 
-The separate [BankPulse Reference](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2-REFERENCE) is an executable example, not a substitute for a teammate's contribution. Review the design, adapt only the needed parts, preserve attribution and demonstrate the result in this repository with the team's own tests and PR history.
+The separate [BankPulse Reference](https://github.com/VillaforTech/bankpulse-reference) is an executable example, not a substitute for a teammate's contribution. Review the design, adapt only the needed parts, preserve attribution and demonstrate the result in this repository with the team's own tests and PR history.
 
 ## Security and project context
 
