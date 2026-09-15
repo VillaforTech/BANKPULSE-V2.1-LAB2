@@ -6,11 +6,11 @@ BankPulse is a shared team portfolio project. Each contribution should improve a
 
 | Issue | Owner | Product outcome |
 | --- | --- | --- |
-| [#1](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues/1) | `@nikotov` | Durable Social Split facts, event contracts and transactional outbox |
-| [#2](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues/2) | `@DanielSalazar0710` | Continuous analytics, deduplication, persistent state and timers |
-| [#3](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues/3) | `@oandretty010` | Grafana Live panels, business alerts and reconnect behavior |
-| [#4](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues/4) | `@VillaforTech` | Redpanda, Compose integration, CI and required release gate |
-| [#5](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues/5) | `@Dmt-155lbs` | End-to-end behavior, resilience, render latency and evidence |
+| [#1](https://github.com/VillaforTech/bankpulse/issues/1) | `@nikotov` | Durable Social Split facts, event contracts and transactional outbox |
+| [#2](https://github.com/VillaforTech/bankpulse/issues/2) | `@DanielSalazar0710` | Continuous analytics, deduplication, persistent state and timers |
+| [#3](https://github.com/VillaforTech/bankpulse/issues/3) | `@oandretty010` | Grafana Live panels, business alerts and reconnect behavior |
+| [#4](https://github.com/VillaforTech/bankpulse/issues/4) | `@VillaforTech` | Redpanda, Compose integration, CI and required release gate |
+| [#5](https://github.com/VillaforTech/bankpulse/issues/5) | `@Dmt-155lbs` | End-to-end behavior, resilience, render latency and evidence |
 
 Issue ownership coordinates the work; portfolio credit follows reviewed and merged commits. Agree on the event contract from #1 before integrating #2 and #3. The integration owner connects the components, and #5 verifies the complete story.
 

@@ -112,7 +112,7 @@ BankPulse is developed as a shared portfolio project. Credit follows merged code
 | [Roberto Villafuerte](https://github.com/VillaforTech) | Platform integration, Compose, CI and release controls |
 | [Daniel Martínez](https://github.com/Dmt-155lbs) | End-to-end, resilience, latency and evidence automation |
 
-The current implementation status and next action for each workstream live in [GitHub Issues](https://github.com/VillaforTech/BANKPULSE-V2.1-LAB2/issues).
+The current implementation status and next action for each workstream live in [GitHub Issues](https://github.com/VillaforTech/bankpulse/issues).
 
 ## Engineering documentation
 
