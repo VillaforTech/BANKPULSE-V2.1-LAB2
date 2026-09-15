@@ -175,6 +175,7 @@ services:
     build: ./frontend
     ports: ["8080:8080"]
     depends_on:
+      business-topics: {condition: service_completed_successfully}
       payments-api: {condition: service_healthy}
       audit-api: {condition: service_healthy}
       experiences-api: {condition: service_healthy}
