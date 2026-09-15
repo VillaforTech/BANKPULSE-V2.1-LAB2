@@ -4,7 +4,7 @@ Este stack es independiente del `compose.yaml` de la aplicacion y se conecta a l
 
 ## 1. Levantar BankPulse
 
-Desde la raiz del laboratorio:
+Desde la raíz del proyecto:
 
 ```bash
 docker compose up -d --build

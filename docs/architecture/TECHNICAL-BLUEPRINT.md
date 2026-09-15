@@ -44,7 +44,7 @@ Convertir las cuatro epicas DDD en servicios desplegables sin perder el core fin
 - Proyeccion de eventos de auditoria.
 
 ## Persistencia fisica vs ownership logico
-Para conservar un Codespace de 4 CPU/8 GB, V2 comparte motores fisicos en laboratorio, pero mantiene aislamiento logico:
+Para conservar un Codespace de 4 CPU/8 GB, V2 comparte motores físicos en desarrollo, pero mantiene aislamiento lógico:
 - MongoDB: bases separadas `audit`, `experiences`, `travel`.
 - PostgreSQL: usuarios/esquemas separados `events` y `social_split`.
 - MariaDB: exclusivamente core financiero.
@@ -54,7 +54,7 @@ En produccion, cada owner podria moverse a instancias administradas independient
 ## Requisitos no funcionales base
 - Health endpoints y metricas Prometheus en todos los servicios.
 - Contenedores ejecutados como usuario no-root.
-- Secrets solo por variables de entorno; valores del repositorio son exclusivos de laboratorio.
+- Secrets solo por variables de entorno; los valores versionados son exclusivos del entorno local.
 - APIs internas no publicadas al host; acceso externo por edge Nginx.
 - CI levanta el sistema real y ejecuta smoke tests.
 - Observabilidad valida los seis servicios y el runtime Docker.

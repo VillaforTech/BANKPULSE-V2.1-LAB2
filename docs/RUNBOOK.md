@@ -38,4 +38,4 @@ docker compose exec mongo mongosh \
 ## Limpieza
 
 - `docker compose down`: detiene sin borrar datos.
-- `docker compose down -v`: elimina también las bases; acción destructiva y solo para reiniciar el laboratorio.
+- `docker compose down -v`: elimina también las bases; acción destructiva reservada para reiniciar deliberadamente el entorno local.

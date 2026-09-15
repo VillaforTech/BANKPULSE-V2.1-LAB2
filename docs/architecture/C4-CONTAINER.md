@@ -19,4 +19,4 @@ Grafana (:3000) ------> Prometheus
 cAdvisor (:8088) -----> Docker runtime metrics
 ```
 
-Los puertos internos 8081-8086 no se publican fuera de Docker Compose. El edge `console` es el unico punto HTTP publicado para las APIs de negocio en el laboratorio.
+Los puertos internos 8081-8086 no se publican fuera de Docker Compose. El edge `console` es el único punto HTTP publicado para las APIs de negocio en el entorno local.

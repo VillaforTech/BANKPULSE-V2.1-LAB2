@@ -29,7 +29,7 @@ Open Codespaces port 8080 and verify:
 - Travel issues a credential and preserves it when Offline mode is enabled.
 - Events displays seats, creates a Redis HOLD, shows countdown and returns 409 when another client holds the same seat.
 - Social Split creates a session, participants, payments, authorizations and then allows close.
-- Architect Mode shows ownership explanations and teaching traces.
+- Architect Mode shows ownership explanations and a client-observed request trace.
 
 ## 5. Observability
 ```bash
