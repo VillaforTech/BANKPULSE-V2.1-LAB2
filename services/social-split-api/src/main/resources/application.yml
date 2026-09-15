@@ -11,6 +11,18 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:redpanda:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+social-split:
+  events-topic: ${SOCIAL_SPLIT_EVENTS_TOPIC:bankpulse.social-split.events.v1}
+  outbox:
+    poll-ms: ${SOCIAL_SPLIT_OUTBOX_POLL_MS:100}
 management:
   endpoints.web.exposure.include: health,info,metrics,prometheus
   endpoint.health.probes.enabled: true

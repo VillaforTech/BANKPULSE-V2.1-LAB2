@@ -10,5 +10,5 @@ public class SplitParticipant {
   protected SplitParticipant(){}
   SplitParticipant(SplitSession session,String memberId,BigDecimal shareAmount){this.session=session;this.memberId=memberId;this.shareAmount=shareAmount;}
   public String getId(){return id;} public String getMemberId(){return memberId;} public BigDecimal getShareAmount(){return shareAmount;} public boolean isAuthorized(){return authorized;} public String getPaymentReference(){return paymentReference;}
-  public void authorize(String paymentReference){this.authorized=true;this.paymentReference=paymentReference;}
+  public void authorize(String paymentReference){if(paymentReference==null||paymentReference.isBlank()) throw new DomainViolationException("payment reference is required");this.authorized=true;this.paymentReference=paymentReference;}
 }
