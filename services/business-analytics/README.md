@@ -91,7 +91,7 @@ python tests/integration.py --docker docker --output integration-evidence.json
 docker compose -f compose.test.yaml down
 ```
 
-El test integrado exige un volumen nuevo del Compose aislado. No borra datos automáticamente.
+El test integrado exige un volumen nuevo del Compose aislado. No borra datos automáticamente. Ese Compose configura el deadline en 3 segundos para observar ambos lados del temporizador; el servicio conserva 120 segundos como valor predeterminado.
 
 Replay reproducible con reloj controlado:
 

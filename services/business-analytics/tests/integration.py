@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TOPIC = "bankpulse.social-split.events.v1"
+TEST_DEADLINE_SECONDS = 3
 
 
 def iso(value):
@@ -146,7 +147,7 @@ def run(docker):
     assert duplicate["kpis"]["counts"]["sessions"] == 1
     record("duplicate delivery has no double count", duplicate["diagnostics"])
 
-    deadline_start = time.time() - 119.2
+    deadline_start = time.time()
     waiting = [
         created("deadline", deadline_start),
         event(
@@ -171,12 +172,12 @@ def run(docker):
     before = until(lambda value: value["kpis"]["counts"]["sessions"] == 2)
     assert before["kpis"]["B-K3"]["value"] == {}
     overdue = until(
-        lambda value: value["kpis"]["B-K3"]["value"] == {"USD": "60"}, timeout=4
+        lambda value: value["kpis"]["B-K3"]["value"] == {"USD": "60"}, timeout=6
     )
     observed = datetime.fromisoformat(
         overdue["generatedAt"].replace("Z", "+00:00")
     ).timestamp()
-    delay = observed - deadline_start - 120
+    delay = observed - deadline_start - TEST_DEADLINE_SECONDS
     assert 0 < delay <= 1
     record(
         "deadline changes KPI without traffic",
